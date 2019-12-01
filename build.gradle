@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group 'be.selske.aoc'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 13
+
+tasks.withType(JavaCompile).each {
+    it.options.compilerArgs.add('--enable-preview')
+}
+
+repositories {
+    mavenCentral()
+}
+
