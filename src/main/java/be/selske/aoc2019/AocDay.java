@@ -7,15 +7,16 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 public abstract class AocDay {
 
     private final List<Solution> solutions;
 
-    public AocDay(Part part1, Part... parts) {
+    public AocDay(PartSolution partSolution1, PartSolution... partSolutions) {
         AtomicInteger count = new AtomicInteger(1);
-        this.solutions = Stream.concat(Stream.of(part1), Stream.of(parts))
-                .map(part -> new Solution("part " + count.getAndIncrement(), part))
+        this.solutions = concat(Stream.of(partSolution1), Stream.of(partSolutions))
+                .map(partSolution -> new Solution("part " + count.getAndIncrement(), partSolution))
                 .collect(toList());
     }
 
@@ -25,16 +26,16 @@ public abstract class AocDay {
                 .forEach(result -> System.out.println(result.name + ": " + result.result + " (" + result.timeTaken + "ms)"));
     }
 
-    public interface Part extends Function<InputStream, String> {
+    protected interface PartSolution extends Function<InputStream, String> {
 
     }
 
     private static class Solution {
 
         private final String name;
-        private final Part solutionSupplier;
+        private final PartSolution solutionSupplier;
 
-        private Solution(String name, Part solutionSupplier) {
+        private Solution(String name, PartSolution solutionSupplier) {
             this.name = name;
             this.solutionSupplier = solutionSupplier;
         }
