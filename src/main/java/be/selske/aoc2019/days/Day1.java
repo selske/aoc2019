@@ -6,11 +6,12 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.function.ToIntFunction;
+import java.util.stream.Stream;
 
 public class Day1 extends AocDay {
 
     public static void main(String[] args) {
-        new Day1().solve(() -> Day1.class.getResourceAsStream("/inputs/day1.txt"));
+        new Day1().solve(() -> Day1.class.getResource("/inputs/day1.txt"));
     }
 
     private Day1() {
@@ -20,9 +21,8 @@ public class Day1 extends AocDay {
         );
     }
 
-    private static String solve(ToIntFunction<Integer> fuelCalculator, InputStream input) {
-        return new BufferedReader(new InputStreamReader(input))
-                .lines()
+    private static String solve(ToIntFunction<Integer> fuelCalculator, Stream<String> input) {
+        return input
                 .map(Integer::parseInt)
                 .mapToInt(fuelCalculator)
                 .sum() + "";

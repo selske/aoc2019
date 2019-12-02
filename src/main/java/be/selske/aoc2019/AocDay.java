@@ -1,6 +1,9 @@
 package be.selske.aoc2019;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -21,13 +24,19 @@ public abstract class AocDay {
                 .collect(toList());
     }
 
-    public void solve(Supplier<InputStream> input) {
+    public void solve(Supplier<URL> input) {
         solutions.stream()
-                .map(solution -> solution.solve(input.get()))
+                .map(solution -> {
+                    try {
+                        return solution.solve(Files.lines(Paths.get(input.get().getFile())));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .forEach(result -> System.out.println(result.name + ": " + result.result + " (" + result.timeTaken + "ms)"));
     }
 
-    protected interface PartSolution extends Function<InputStream, String> {
+    protected interface PartSolution extends Function<Stream<String>, String> {
 
     }
 
@@ -41,7 +50,7 @@ public abstract class AocDay {
             this.solutionSupplier = solutionSupplier;
         }
 
-        private Result solve(InputStream input) {
+        private Result solve(Stream<String> input) {
             long before = System.currentTimeMillis();
             String result = solutionSupplier.apply(input);
             long after = System.currentTimeMillis();
