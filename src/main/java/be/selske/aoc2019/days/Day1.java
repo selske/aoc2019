@@ -10,7 +10,7 @@ import java.util.function.ToIntFunction;
 public class Day1 extends AocDay {
 
     public static void main(String[] args) {
-        new Day1().solve(Day1.class.getResourceAsStream("/inputs/day1"));
+        new Day1().solve(() -> Day1.class.getResourceAsStream("/inputs/day1.txt"));
     }
 
     private Day1() {

@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -20,9 +21,9 @@ public abstract class AocDay {
                 .collect(toList());
     }
 
-    public void solve(InputStream input) {
+    public void solve(Supplier<InputStream> input) {
         solutions.stream()
-                .map(solution -> solution.solve(input))
+                .map(solution -> solution.solve(input.get()))
                 .forEach(result -> System.out.println(result.name + ": " + result.result + " (" + result.timeTaken + "ms)"));
     }
 
