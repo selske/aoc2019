@@ -2,9 +2,6 @@ package be.selske.aoc2019.days;
 
 import be.selske.aoc2019.AocDay;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 

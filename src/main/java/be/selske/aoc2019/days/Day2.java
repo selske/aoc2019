@@ -12,7 +12,7 @@ public class Day2 extends AocDay {
     }
 
     private Day2() {
-        super(Day2::part1, Day2::part1, Day2::part2, Day2::part2);
+        super(Day2::part1, Day2::part2);
     }
 
     private static String part1(Stream<String> input) {
