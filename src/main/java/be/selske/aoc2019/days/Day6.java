@@ -76,8 +76,6 @@ public class Day6 extends AocDay {
             if (orbitAmount == -1) {
                 if (center == null) {
                     orbitAmount = 0;
-                } else if (orbitAmount > -1) {
-                    return orbitAmount;
                 } else {
                     orbitAmount = center.getOrbitAmount() + 1;
                 }
