@@ -1,6 +1,7 @@
 package be.selske.aoc2019.days;
 
 import be.selske.aoc2019.AocDay;
+import be.selske.aoc2019.util.DotLetter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,25 +46,17 @@ public class Day8 extends AocDay {
         int pixelsPerLayer = 25 * 6;
         int[] image = IntStream.generate(() -> 2).limit(pixelsPerLayer).toArray();
 
+        int[][] imageAsFont = new int[6][25];
         for (int i = 0; i < chars.length; i += pixelsPerLayer) {
             for (int j = 0; j < pixelsPerLayer; j++) {
                 char c = chars[i + j];
                 if (image[j] == 2) {
                     image[j] = c - 48;
+                    imageAsFont[j / 25][j % 25] = c - 48;
                 }
             }
         }
-        for (int row = 0; row < 6; row++) {
-            for (int col = 0; col < 25; col++) {
-                if (image[row * 25 + col] == 1) {
-                    System.out.print("X");
-                } else if (image[row * 25 + col] == 0) {
-                    System.out.print(" ");
-                }
-            }
-            System.out.println();
-        }
-        return null;
+        return DotLetter.getText(imageAsFont);
     }
 
 }
