@@ -84,7 +84,6 @@ public class Day3 extends AocDay {
                 coordinates.add(newPosition);
                 currentPosition = newPosition;
             }
-
         }
         return coordinates;
     }

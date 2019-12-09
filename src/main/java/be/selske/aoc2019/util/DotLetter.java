@@ -312,6 +312,5 @@ public enum DotLetter {
         };
 
         System.out.println(DotLetter.getText(day8));
-
     }
 }

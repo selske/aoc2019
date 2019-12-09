@@ -3,9 +3,6 @@ package be.selske.aoc2019.days;
 import be.selske.aoc2019.AocDay;
 import be.selske.aoc2019.util.DotLetter;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 

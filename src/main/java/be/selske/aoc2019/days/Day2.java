@@ -41,7 +41,7 @@ public class Day2 extends AocDay {
 
         IntComputer intComputer = new IntComputer(memory);
         intComputer.run();
-        return intComputer.getMemoryValue(0) + "";
+        return intComputer.getMemoryValue(0L) + "";
     }
 
 }

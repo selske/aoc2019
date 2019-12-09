@@ -21,7 +21,6 @@ public class Day6 extends AocDay {
         return getOrbitMap(input).values().stream()
                 .mapToInt(OrbitingObject::getOrbitAmount)
                 .sum() + "";
-
     }
 
     private static String part2(Stream<String> input) {

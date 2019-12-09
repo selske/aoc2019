@@ -2,7 +2,6 @@ package be.selske.aoc2019.days.intcomputer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
