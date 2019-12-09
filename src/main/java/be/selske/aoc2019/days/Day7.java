@@ -73,7 +73,7 @@ public class Day7 extends AocDay {
 
         boolean running = true;
         for (int i = 0; i < phaseSettings.length; i++) {
-            int phaseSetting = phaseSettings[i];
+            long phaseSetting = phaseSettings[i];
             IntComputer intComputer = amplifiers.get(i);
             intComputer.run(phaseSetting);
             intComputer.run(output);

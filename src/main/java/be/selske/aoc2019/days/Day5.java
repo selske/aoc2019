@@ -26,7 +26,7 @@ public class Day5 extends AocDay {
         return runProgram(5, parseInput(input));
     }
 
-    private static String runProgram(int inputValue, long[] inputs) {
+    private static String runProgram(long inputValue, long[] inputs) {
         IntComputer intComputer = new IntComputer(Arrays.copyOf(inputs, inputs.length));
 
         intComputer.run(inputValue);

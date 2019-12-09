@@ -17,7 +17,7 @@ public class Day9 extends AocDay {
         );
     }
 
-    private static String solve(Stream<String> input, int i) {
+    private static String solve(Stream<String> input, long i) {
         long[] memory = parseInput(input);
         IntComputer intComputer = new IntComputer(memory);
         intComputer.run(i);

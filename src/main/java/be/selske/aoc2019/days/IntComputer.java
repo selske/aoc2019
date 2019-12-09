@@ -25,7 +25,11 @@ public final class IntComputer {
         this.relativeBase = 0;
     }
 
-    void run(long input) {
+    void run() {
+        run(null);
+    }
+
+    void run(Long input) {
         this.input = input;
         this.setWaitingForInput(false);
         while (isRunning() && !isWaitingForInput()) {

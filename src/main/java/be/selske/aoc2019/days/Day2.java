@@ -20,7 +20,7 @@ public class Day2 extends AocDay {
     }
 
     private static String part2(Stream<String> input) {
-        int[] inputs = parseInput(input);
+        long[] inputs = parseInput(input);
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < 100; j++) {
                 if ("19690720".equals(runProgram(inputs, i, j))) {
@@ -31,32 +31,19 @@ public class Day2 extends AocDay {
         return null;
     }
 
-    private static String runProgram(int[] inputs, int noun, int verb) {
-        int[] memory = Arrays.copyOf(inputs, inputs.length);
+    private static String runProgram(long[] inputs, int noun, int verb) {
+        long[] memory = Arrays.copyOf(inputs, inputs.length);
         memory[1] = noun;
         memory[2] = verb;
 
-        program:
-        for (int i = 0; i < memory.length; i += 4) {
-            int value = memory[i];
-            switch (value) {
-                case 1:
-                    memory[memory[i + 3]] = memory[memory[i + 1]] + memory[memory[i + 2]];
-                    break;
-                case 2:
-                    memory[memory[i + 3]] = memory[memory[i + 1]] * memory[memory[i + 2]];
-                    break;
-                case 99:
-                    break program;
-            }
-        }
-
-        return memory[0] + "";
+        IntComputer intComputer = new IntComputer(memory);
+        intComputer.run();
+        return intComputer.getMemoryValue(0) + "";
     }
 
-    private static int[] parseInput(Stream<String> input) {
+    private static long[] parseInput(Stream<String> input) {
         return Stream.of(input.findFirst().orElseThrow().split(","))
-                .mapToInt(Integer::valueOf)
+                .mapToLong(Long::valueOf)
                 .toArray();
     }
 
