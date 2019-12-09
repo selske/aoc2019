@@ -1,9 +1,11 @@
 package be.selske.aoc2019.days;
 
 import be.selske.aoc2019.AocDay;
+import be.selske.aoc2019.days.intcomputer.IntComputer;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
+
+import static be.selske.aoc2019.days.intcomputer.IntComputer.parseInput;
 
 public class Day5 extends AocDay {
 
@@ -13,31 +15,18 @@ public class Day5 extends AocDay {
 
     private Day5() {
         super(
-                Day5::part1,
-                Day5::part2
+                (input) -> runProgram(input, 1),
+                (input) -> runProgram(input, 5)
         );
     }
 
-    private static String part1(Stream<String> input) {
-        return runProgram(1, parseInput(input));
-    }
-
-    private static String part2(Stream<String> input) {
-        return runProgram(5, parseInput(input));
-    }
-
-    private static String runProgram(long inputValue, long[] inputs) {
-        IntComputer intComputer = new IntComputer(Arrays.copyOf(inputs, inputs.length));
+    private static String runProgram(Stream<String> input, long inputValue) {
+        long[] memory = parseInput(input.findFirst().orElseThrow());
+        IntComputer intComputer = new IntComputer(memory);
 
         intComputer.run(inputValue);
 
         return intComputer.getOutput() + "";
-    }
-
-    private static long[] parseInput(Stream<String> input) {
-        return Stream.of(input.findFirst().orElseThrow().split(","))
-                .mapToLong(Long::valueOf)
-                .toArray();
     }
 
 }

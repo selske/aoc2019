@@ -1,6 +1,7 @@
 package be.selske.aoc2019.days;
 
 import be.selske.aoc2019.AocDay;
+import be.selske.aoc2019.days.intcomputer.IntComputer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static be.selske.aoc2019.days.Day7.Permutator.permute;
+import static be.selske.aoc2019.days.intcomputer.IntComputer.parseInput;
 import static be.selske.aoc2019.util.MathUtil.factorial;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.rangeClosed;
@@ -27,7 +29,7 @@ public class Day7 extends AocDay {
     }
 
     private static String solve(Stream<String> input, int from, int to) {
-        long[] initialMemory = parseInput(input);
+        long[] initialMemory = parseInput(input.findFirst().orElseThrow());
 
         List<Long> outputSignals = new ArrayList<>(factorial(to - from + 1));
         permute(rangeClosed(from, to).toArray(), (phaseSettings) -> {
@@ -93,12 +95,6 @@ public class Day7 extends AocDay {
             }
         }
         return output;
-    }
-
-    private static long[] parseInput(Stream<String> input) {
-        return Stream.of(input.findFirst().orElseThrow().split(","))
-                .mapToLong(Long::valueOf)
-                .toArray();
     }
 
 }
