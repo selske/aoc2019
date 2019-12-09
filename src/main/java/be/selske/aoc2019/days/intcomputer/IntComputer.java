@@ -2,6 +2,7 @@ package be.selske.aoc2019.days.intcomputer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
@@ -71,10 +72,10 @@ public final class IntComputer {
         this.output = output;
     }
 
-    Long takeInput() {
+    Optional<Long> takeInput() {
         Long input = this.input;
         this.input = null;
-        return input;
+        return Optional.ofNullable(input);
     }
 
     boolean isWaitingForInput() {

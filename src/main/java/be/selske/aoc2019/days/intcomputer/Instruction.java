@@ -79,13 +79,13 @@ interface Instruction extends Consumer<IntComputer> {
                 intComputer.advancePointer(4);
             };
             case 3 -> intComputer -> {
-                Long input = intComputer.takeInput();
-                if (input != null) {
-                    parameters.get(0).set(intComputer, input);
-                    intComputer.advancePointer(2);
-                } else {
-                    intComputer.waitForInput();
-                }
+                intComputer.takeInput()
+                        .ifPresentOrElse(input -> {
+                                    parameters.get(0).set(intComputer, input);
+                                    intComputer.advancePointer(2);
+                                },
+                                intComputer::waitForInput
+                        );
             };
             case 4 -> intComputer -> {
                 intComputer.output(parameters.get(0).get(intComputer));
