@@ -27,14 +27,14 @@ public class Day7 extends AocDay {
     }
 
     private static String solve(Stream<String> input, int from, int to) {
-        int[] initialMemory = parseInput(input);
+        long[] initialMemory = parseInput(input);
 
-        List<Integer> outputSignals = new ArrayList<>(factorial(to - from + 1));
+        List<Long> outputSignals = new ArrayList<>(factorial(to - from + 1));
         permute(rangeClosed(from, to).toArray(), (phaseSettings) -> {
             outputSignals.add(getOutput(initialMemory, phaseSettings));
         });
         return outputSignals.stream()
-                .mapToInt(Integer::intValue)
+                .mapToLong(Long::longValue)
                 .max()
                 .orElseThrow() + "";
     }
@@ -64,8 +64,8 @@ public class Day7 extends AocDay {
 
     }
 
-    private static int getOutput(int[] memory, int[] phaseSettings) {
-        int output = 0;
+    private static long getOutput(long[] memory, int[] phaseSettings) {
+        long output = 0;
 
         List<IntComputer> amplifiers = Arrays.stream(phaseSettings)
                 .mapToObj(ps -> new IntComputer(Arrays.copyOf(memory, memory.length)))
@@ -95,9 +95,9 @@ public class Day7 extends AocDay {
         return output;
     }
 
-    private static int[] parseInput(Stream<String> input) {
+    private static long[] parseInput(Stream<String> input) {
         return Stream.of(input.findFirst().orElseThrow().split(","))
-                .mapToInt(Integer::valueOf)
+                .mapToLong(Long::valueOf)
                 .toArray();
     }
 

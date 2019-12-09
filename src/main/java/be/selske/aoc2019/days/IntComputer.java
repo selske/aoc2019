@@ -1,39 +1,50 @@
 package be.selske.aoc2019.days;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.lang.Math.toIntExact;
+import static java.util.stream.Collectors.toList;
+
 public final class IntComputer {
 
-    private final int[] memory;
-    public Integer input;
-    private int pointer;
-    private int output;
+    private final List<Long> memory;
+    public Long input;
+    private long pointer;
+    private int relativeBase;
+    private long output;
     private boolean running = true;
     private boolean waitingForInput = false;
 
-    public IntComputer(int[] memory) {
-        this.memory = memory;
+    public IntComputer(long[] memory) {
+        this.memory = Arrays.stream(memory).boxed().collect(toList());
         this.pointer = 0;
+        this.relativeBase = 0;
     }
 
-    void run(int input) {
+    void run(long input) {
         this.input = input;
         this.setWaitingForInput(false);
         while (isRunning() && !isWaitingForInput()) {
-            int value = memory[pointer];
+            int value = toIntExact(getMemoryValue(pointer));
 
             Instruction.fromValue(value).accept(this);
         }
     }
 
-    public void setPointer(int position) {
+    public void setPointer(long position) {
         this.pointer = position;
     }
 
-    public void advancePointer(int amount) {
+    public void advancePointer(long amount) {
         this.pointer += amount;
+    }
+
+    private void advanceRelativeBase(long amount) {
+        this.relativeBase += amount;
     }
 
     @Override
@@ -46,15 +57,17 @@ public final class IntComputer {
                 '}';
     }
 
-    public int getOutput() {
+    public long getOutput() {
         return output;
     }
 
-    public void output(int output) {
+    public void output(long output) {
         this.output = output;
     }
 
-    public Integer getInput() {
+    public Long takeInput() {
+        Long input = this.input;
+        this.input = null;
         return input;
     }
 
@@ -74,41 +87,103 @@ public final class IntComputer {
         this.waitingForInput = waitingForInput;
     }
 
+    public void setMemoryValue(long index, long value) {
+        while (memory.size() <= index) {
+            memory.add(0L);
+        }
+        memory.set(toIntExact(index), value);
+    }
+
+    public long getMemoryValue(long index) {
+        while (memory.size() <= index) {
+            memory.add(0L);
+        }
+        return memory.get(toIntExact(index));
+    }
+
+    private interface ParameterMode extends BiFunction<IntComputer, Long, Long> {
+
+        default Long getParameter(IntComputer intComputer, int pointerOffset) {
+            return apply(intComputer, (long) pointerOffset);
+        }
+
+    }
+
     private interface Instruction extends Consumer<IntComputer> {
 
         static Instruction fromValue(int instructionValue) {
-
             int value = instructionValue % 100;
-            BiFunction<IntComputer, Integer, Integer> positionMode = (intComputer, i) -> intComputer.memory[intComputer.pointer + i];
-            BiFunction<IntComputer, Integer, Integer> immediateMode = (intComputer, i) -> intComputer.pointer + i;
+            ParameterMode positionMode = (intComputer, i) -> intComputer.getMemoryValue(intComputer.pointer + i);
+            ParameterMode immediateMode = (intComputer, i) -> intComputer.pointer + i;
+            ParameterMode relativeMode = (intComputer, i) -> intComputer.relativeBase + intComputer.getMemoryValue(intComputer.pointer + i);
 
-            final Function<IntComputer,Integer> firstParameterGetter;
-            if ((instructionValue / 100) % 10 == 0) {
-                firstParameterGetter = (intComputer) -> intComputer.memory[positionMode.apply(intComputer, 1)];
+            final Function<IntComputer, Long> firstParameterGetter;
+            final ParameterMode firstParameterMode;
+            int firstParamMode = (instructionValue / 100) % 10;
+            if (firstParamMode == 0) {
+                firstParameterMode = positionMode;
+                firstParameterGetter = (intComputer) -> intComputer.getMemoryValue(firstParameterMode.apply(intComputer, 1L));
+            } else if (firstParamMode == 1) {
+                firstParameterMode = immediateMode;
+                firstParameterGetter = (intComputer) -> intComputer.getMemoryValue(firstParameterMode.apply(intComputer, 1L));
+            } else if (firstParamMode == 2) {
+                firstParameterMode = relativeMode;
+                firstParameterGetter = (intComputer) -> intComputer.getMemoryValue(firstParameterMode.apply(intComputer, 1L));
             } else {
-                firstParameterGetter = (intComputer) -> intComputer.memory[immediateMode.apply(intComputer, 1)];
+                throw new IllegalArgumentException();
             }
-            final Function<IntComputer, Integer> secondParameterGetter;
-            if ((instructionValue / 1000) % 10 == 0) {
-                secondParameterGetter = (intComputer) -> intComputer.memory[positionMode.apply(intComputer, 2)];
+            final Function<IntComputer, Long> secondParameterGetter;
+            final ParameterMode secondParameterMode;
+            int secondParamMode = (instructionValue / 1_000) % 10;
+            if (secondParamMode == 0) {
+                secondParameterMode = positionMode;
+                secondParameterGetter = (intComputer) -> intComputer.getMemoryValue(secondParameterMode.apply(intComputer, 2L));
+            } else if (secondParamMode == 1) {
+                secondParameterMode = immediateMode;
+                secondParameterGetter = (intComputer) -> intComputer.getMemoryValue(secondParameterMode.apply(intComputer, 2L));
+            } else if (secondParamMode == 2) {
+                secondParameterMode = relativeMode;
+                secondParameterGetter = (intComputer) -> intComputer.getMemoryValue(secondParameterMode.apply(intComputer, 2L));
             } else {
-                secondParameterGetter = (intComputer) -> intComputer.memory[immediateMode.apply(intComputer, 2)];
+                throw new IllegalArgumentException();
+            }
+            final Function<IntComputer, Long> thirdParameterGetter;
+            final ParameterMode thirdParameterMode;
+            int thirdParamMode = (instructionValue / 10_000) % 10;
+            if (thirdParamMode == 0) {
+                thirdParameterMode = positionMode;
+                thirdParameterGetter = (intComputer) -> intComputer.getMemoryValue(thirdParameterMode.apply(intComputer, 3L));
+            } else if (thirdParamMode == 1) {
+                thirdParameterMode = immediateMode;
+                thirdParameterGetter = (intComputer) -> intComputer.getMemoryValue(thirdParameterMode.apply(intComputer, 3L));
+            } else if (thirdParamMode == 2) {
+                thirdParameterMode = relativeMode;
+                thirdParameterGetter = (intComputer) -> intComputer.getMemoryValue(thirdParameterMode.apply(intComputer, 3L));
+            } else {
+                throw new IllegalArgumentException();
             }
 
             return switch (value) {
                 case 1 -> intComputer -> {
-                    intComputer.memory[intComputer.memory[intComputer.pointer + 3]] = firstParameterGetter.apply(intComputer) + secondParameterGetter.apply(intComputer);
+                    Long firstParam = firstParameterGetter.apply(intComputer);
+                    Long secondParam = secondParameterGetter.apply(intComputer);
+                    long thirdParameter = thirdParameterMode.getParameter(intComputer, 3);
+                    intComputer.setMemoryValue(thirdParameter, firstParam + secondParam);
                     intComputer.advancePointer(4);
                 };
                 case 2 -> intComputer -> {
-                    intComputer.memory[intComputer.memory[intComputer.pointer + 3]] = firstParameterGetter.apply(intComputer) * secondParameterGetter.apply(intComputer);
+                    Long firstParam = firstParameterGetter.apply(intComputer);
+                    Long secondParam = secondParameterGetter.apply(intComputer);
+                    long thirdParameter = thirdParameterMode.getParameter(intComputer, 3);
+                    intComputer.setMemoryValue(thirdParameter, firstParam * secondParam);
                     intComputer.advancePointer(4);
                 };
                 case 3 -> intComputer -> {
-                    if (intComputer.getInput() != null) {
-                        intComputer.memory[intComputer.memory[intComputer.pointer + 1]] = intComputer.getInput();
-                        intComputer.input = null;
-                        intComputer.pointer += 2;
+                    Long input = intComputer.takeInput();
+                    if (input != null) {
+                        Long firstParam = firstParameterMode.getParameter(intComputer, 1);
+                        intComputer.setMemoryValue(firstParam, input);
+                        intComputer.advancePointer(2);
                     } else {
                         intComputer.setWaitingForInput(true);
                     }
@@ -118,7 +193,7 @@ public final class IntComputer {
                     intComputer.advancePointer(2);
                 };
                 case 5 -> intComputer -> {
-                    int firstParam = firstParameterGetter.apply(intComputer);
+                    long firstParam = firstParameterGetter.apply(intComputer);
                     if (firstParam != 0) {
                         intComputer.setPointer(secondParameterGetter.apply(intComputer));
                     } else {
@@ -126,29 +201,35 @@ public final class IntComputer {
                     }
                 };
                 case 6 -> intComputer -> {
-                    int firstParam = firstParameterGetter.apply(intComputer);
+                    long firstParam = firstParameterGetter.apply(intComputer);
                     if (firstParam == 0) {
-                        intComputer.setPointer(secondParameterGetter.apply(intComputer));
+                        intComputer.setPointer(secondParameterGetter.apply(intComputer).intValue());
                     } else {
                         intComputer.advancePointer(3);
                     }
                 };
                 case 7 -> intComputer -> {
-                    int firstParam = firstParameterGetter.apply(intComputer);
-                    int secondParam = secondParameterGetter.apply(intComputer);
-                    intComputer.memory[intComputer.memory[intComputer.pointer + 3]] = firstParam < secondParam ? 1 : 0;
+                    long firstParam = firstParameterGetter.apply(intComputer);
+                    long secondParam = secondParameterGetter.apply(intComputer);
+                    long thirdParameter = thirdParameterMode.getParameter(intComputer, 3);
+                    intComputer.setMemoryValue(thirdParameter, firstParam < secondParam ? 1 : 0);
                     intComputer.advancePointer(4);
                 };
                 case 8 -> intComputer -> {
-                    int firstParam = firstParameterGetter.apply(intComputer);
-                    int secondParam = secondParameterGetter.apply(intComputer);
-                    intComputer.memory[intComputer.memory[intComputer.pointer + 3]] = firstParam == secondParam ? 1 : 0;
+                    long firstParam = firstParameterGetter.apply(intComputer);
+                    long secondParam = secondParameterGetter.apply(intComputer);
+                    long thirdParameter = thirdParameterMode.getParameter(intComputer, 3);
+                    intComputer.setMemoryValue(thirdParameter, firstParam == secondParam ? 1 : 0);
                     intComputer.advancePointer(4);
+                };
+                case 9 -> intComputer -> {
+                    long firstParam = firstParameterGetter.apply(intComputer);
+                    intComputer.advanceRelativeBase(firstParam);
+                    intComputer.advancePointer(2);
                 };
                 case 99 -> intComputer -> intComputer.setRunning(false);
                 default -> throw new IllegalArgumentException();
             };
-
         }
 
     }
