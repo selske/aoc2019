@@ -13,7 +13,7 @@ public class Day9 extends AocDay {
         new Day9().solve(() -> Day9.class.getResource("/inputs/day9.txt"));
     }
 
-    public Day9() {
+    private Day9() {
         super(
                 (input) -> solve(input, 1),
                 (input) -> solve(input, 2)

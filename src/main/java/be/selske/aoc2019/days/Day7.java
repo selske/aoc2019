@@ -21,7 +21,7 @@ public class Day7 extends AocDay {
         new Day7().solve(() -> Day7.class.getResource("/inputs/day7.txt"));
     }
 
-    public Day7() {
+    private Day7() {
         super(
                 (input) -> solve(input, 0, 4),
                 (input) -> solve(input, 5, 9)
@@ -43,7 +43,7 @@ public class Day7 extends AocDay {
 
     static class Permutator {
 
-        public static void permute(int[] arr, Consumer<int[]> consumer) {
+        static void permute(int[] arr, Consumer<int[]> consumer) {
             permute(arr, 0, consumer);
         }
 

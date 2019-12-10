@@ -30,7 +30,7 @@ interface Instruction extends Consumer<IntComputer> {
             setter.accept(intComputer, value);
         }
 
-        public static ParameterAccessor parameterAccessor(int instructionValue, long index) {
+        static ParameterAccessor parameterAccessor(int instructionValue, long index) {
             BiFunction<IntComputer, Long, Long> parameterMode = getParameterMode(instructionValue, index);
 
             return new ParameterAccessor(

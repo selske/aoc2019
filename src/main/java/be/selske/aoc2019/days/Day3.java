@@ -18,7 +18,7 @@ public class Day3 extends AocDay {
         new Day3().solve(() -> Day3.class.getResource("/inputs/day3.txt"));
     }
 
-    public Day3() {
+    private Day3() {
         super(Day3::part1, Day3::part2);
     }
 
