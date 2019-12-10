@@ -1,8 +1,9 @@
 package be.selske.aoc2019;
 
 import java.util.Objects;
+import java.util.function.Function;
 
-import static java.lang.Math.abs;
+import static java.lang.StrictMath.*;
 
 public final class Coordinate {
 
@@ -58,6 +59,24 @@ public final class Coordinate {
     @Override
     public String toString() {
         return "[" + x + "," + y + ']';
+    }
+
+    public boolean between(Coordinate c1, Coordinate c2) {
+        return isInlineWith(c1, c2)
+                && between(c1, c2, Coordinate::getX)
+                && between(c1, c2, Coordinate::getY);
+    }
+
+    private boolean isInlineWith(Coordinate c1, Coordinate c2) {
+        return (c1.getY() - c2.getY()) * (c1.getX() - getX()) == (c1.getY() - getY()) * (c1.getX() - c2.getX());
+    }
+
+    private boolean between(Coordinate c1, Coordinate c2, Function<Coordinate, Integer> dimension) {
+        int p = dimension.apply(this);
+        int p1 = dimension.apply(c1);
+        int p2 = dimension.apply(c2);
+
+        return (p <= p1 && p >= p2) || (p >= p1 && p <= p2);
     }
 
 }
