@@ -53,7 +53,6 @@ public class Day11 extends AocDay {
                 int x = col + left * -1;
                 image[y][x] = color.intValue();
             }
-            System.out.println();
         }
         return DotLetter.getText(image);
     }
