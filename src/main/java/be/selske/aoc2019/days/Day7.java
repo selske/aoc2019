@@ -79,7 +79,7 @@ public class Day7 extends AocDay {
             IntComputer intComputer = amplifiers.get(i);
             intComputer.run(phaseSetting);
             intComputer.run(output);
-            output = intComputer.getOutput();
+            output = intComputer.getLastOutput();
             if (!intComputer.isRunning()) {
                 running = false;
             }
@@ -88,7 +88,7 @@ public class Day7 extends AocDay {
             for (int i = 0; i < phaseSettings.length; i++) {
                 IntComputer intComputer = amplifiers.get(i);
                 intComputer.run(output);
-                output = intComputer.getOutput();
+                output = intComputer.getLastOutput();
                 if (!intComputer.isRunning()) {
                     running = false;
                 }

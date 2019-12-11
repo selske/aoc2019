@@ -1,11 +1,13 @@
 package be.selske.aoc2019.days.intcomputer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
 public final class IntComputer {
@@ -14,7 +16,7 @@ public final class IntComputer {
     private Long input;
     private long pointer;
     private int relativeBase;
-    private long output;
+    private List<Long> output = new ArrayList<>();
     private boolean running = true;
     private boolean waitingForInput = false;
 
@@ -64,12 +66,20 @@ public final class IntComputer {
         this.relativeBase += amount;
     }
 
-    public long getOutput() {
-        return output;
+    public void clearOutput() {
+        output.clear();
+    }
+
+    public List<Long> getOutput() {
+        return unmodifiableList(output);
+    }
+
+    public long getLastOutput() {
+        return output.get(output.size() - 1);
     }
 
     void output(long output) {
-        this.output = output;
+        this.output.add(output);
     }
 
     Optional<Long> takeInput() {

@@ -26,7 +26,7 @@ public class Day5 extends AocDay {
 
         intComputer.run(inputValue);
 
-        return intComputer.getOutput() + "";
+        return intComputer.getLastOutput() + "";
     }
 
 }

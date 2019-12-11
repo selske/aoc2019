@@ -24,7 +24,7 @@ public class Day9 extends AocDay {
         long[] memory = parseInput(input.findFirst().orElseThrow());
         IntComputer intComputer = new IntComputer(memory);
         intComputer.run(i);
-        return intComputer.getOutput() + "";
+        return intComputer.getLastOutput() + "";
     }
 
 }
