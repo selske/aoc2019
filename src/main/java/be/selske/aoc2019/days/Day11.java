@@ -42,11 +42,6 @@ public class Day11 extends AocDay {
             if (coordinate.getY() > top) top = coordinate.getY();
             if (coordinate.getY() < bottom) bottom = coordinate.getY();
         }
-        System.out.println("left: " + left);
-        System.out.println("top: " + top);
-        System.out.println("right: " + right);
-        System.out.println("bottom: " + bottom);
-        System.out.println("colors = " + colors);
         for (int row = top; row >= bottom; row--) {
             for (int col = left; col <= right; col++) {
                 Long color = colors.getOrDefault(new Coordinate(col, row), 0L);
@@ -64,11 +59,7 @@ public class Day11 extends AocDay {
         Direction direction = Direction.UP;
         Map<Coordinate, Long> colors = new HashMap<>();
         colors.put(location, initialSquareColor);
-        // TODO: loop detection
-        for (int i = 0; i < 1_000_000 && intComputer.isRunning(); i++) {
-//            if (colors.containsKey(location)) {
-//                System.out.println("visited " + location + " already");
-//            }
+        while (intComputer.isRunning()) {
             intComputer.run(colors.getOrDefault(location, 0L));
             List<Long> instructions = intComputer.getOutput();
             direction = switch (instructions.get(1).intValue()) {
@@ -79,7 +70,6 @@ public class Day11 extends AocDay {
             Long color = instructions.get(0);
             colors.put(location, color);
             intComputer.clearOutput();
-            System.out.println("painting " + location + " " + (color == 0 ? "black" : "white"));
 
             location = direction.move(location);
         }
