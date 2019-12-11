@@ -64,6 +64,7 @@ public class Day11 extends AocDay {
         Direction direction = Direction.UP;
         Map<Coordinate, Long> colors = new HashMap<>();
         colors.put(location, initialSquareColor);
+        // TODO: loop detection
         for (int i = 0; i < 1_000_000 && intComputer.isRunning(); i++) {
 //            if (colors.containsKey(location)) {
 //                System.out.println("visited " + location + " already");
