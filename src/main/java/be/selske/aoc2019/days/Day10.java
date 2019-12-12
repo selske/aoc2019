@@ -6,7 +6,6 @@ import be.selske.aoc2019.Coordinate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import static java.lang.StrictMath.atan2;
@@ -76,17 +75,16 @@ public class Day10 extends AocDay {
         List<List<Coordinate>> collect = coordinates.parallelStream()
                 .filter(not(base::equals))
                 .collect(groupingBy(c -> getAngle(c, base)))
-                .entrySet()
-                .stream()
+                .entrySet().stream()
                 .sorted((comparing(e -> e.getKey() * -1)))
-                .map((e) -> e.getValue().stream().sorted(comparingDouble(base::distance)).collect(toList()))
+                .map((e) -> e.getValue().stream().sorted(comparingDouble(base::distance).reversed()).collect(toList()))
                 .collect(toList());
 
         int destroyCount = 0;
-        while (destroyCount < 200) {
-            for (int i = 0; i < collect.size() && destroyCount < 200; i++) {
-                if (collect.get(i).size() > 0) {
-                    Coordinate destroyed = collect.get(i).remove(0);
+        while (true) {
+            for (List<Coordinate> coordinateList : collect) {
+                if (coordinateList.size() > 0) {
+                    Coordinate destroyed = coordinateList.remove(coordinateList.size() - 1);
                     destroyCount++;
                     if (destroyCount == 200) {
                         return destroyed.getX() * 100 + destroyed.getY() + "";
@@ -94,8 +92,6 @@ public class Day10 extends AocDay {
                 }
             }
         }
-
-        return null;
     }
 
     private static double getAngle(Coordinate c, Coordinate base) {

@@ -4,6 +4,7 @@ import be.selske.aoc2019.AocDay;
 import be.selske.aoc2019.Coordinate;
 import be.selske.aoc2019.Direction;
 import be.selske.aoc2019.days.intcomputer.IntComputer;
+import be.selske.aoc2019.util.DotLetter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,21 +37,24 @@ public class Day11 extends AocDay {
         int top = Integer.MIN_VALUE;
         int right = Integer.MIN_VALUE;
         int bottom = Integer.MAX_VALUE;
+
         for (Coordinate coordinate : colors.keySet()) {
             if (coordinate.getX() < left) left = coordinate.getX();
             if (coordinate.getX() > right) right = coordinate.getX();
             if (coordinate.getY() > top) top = coordinate.getY();
             if (coordinate.getY() < bottom) bottom = coordinate.getY();
         }
+
+        int[][] image = new int[top - bottom + 1][right - left + 1];
         for (int row = top; row >= bottom; row--) {
             for (int col = left; col <= right; col++) {
                 Long color = colors.getOrDefault(new Coordinate(col, row), 0L);
-                System.out.print(color == 0 ? " " : "X");
+                int y = row + bottom * -1;
+                int x = col + left * -1;
+                image[y][x] = color.intValue();
             }
-            System.out.println();
         }
-        // TODO: dotletter implementation
-        return null;
+        return DotLetter.getText(image);
     }
 
     private static Map<Coordinate, Long> calculateColors(Stream<String> input, long initialSquareColor) {
