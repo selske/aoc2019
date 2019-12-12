@@ -50,14 +50,15 @@ public class Day12 extends AocDay {
 
     private static int findCycle(List<MoonState> moonStates, Function<MoonState, SingleDimensionMoonState> getter) {
         Set<List<SingleDimensionMoonState>> visitedStates = new HashSet<>();
+        visitedStates.add(moonStates.stream().map(getter).collect(toList()));
+
         for (int step = 1; ; step++) {
+            moonStates = step(moonStates);
             List<SingleDimensionMoonState> singleDimensionMoonStates = moonStates.stream().map(getter).collect(toList());
             if (visitedStates.contains(singleDimensionMoonStates)) {
                 return step;
             }
             visitedStates.add(singleDimensionMoonStates);
-
-            moonStates = step(moonStates);
         }
     }
 
