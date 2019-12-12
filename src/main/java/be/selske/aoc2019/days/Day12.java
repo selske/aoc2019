@@ -1,10 +1,10 @@
 package be.selske.aoc2019.days;
 
 import be.selske.aoc2019.AocDay;
+import be.selske.aoc2019.util.MathUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -21,7 +21,8 @@ public class Day12 extends AocDay {
 
     private Day12() {
         super(
-                Day12::part1
+                Day12::part1,
+                Day12::part2
         );
     }
 
@@ -35,6 +36,60 @@ public class Day12 extends AocDay {
         return moonStates.stream()
                 .mapToInt(MoonState::getEnergy)
                 .sum() + "";
+    }
+
+    public static String part2(Stream<String> input) {
+        List<MoonState> moonStates = parseInput(input);
+
+        int[] loopSizes = Stream.<DimensionGetter>of(MoonState::getX, MoonState::getY, MoonState::getZ)
+                .mapToInt(getter -> findCycle(moonStates, getter))
+                .toArray();
+
+        return MathUtil.lcm(loopSizes) + "";
+    }
+
+    private static int findCycle(List<MoonState> moonStates, Function<MoonState, SingleDimensionMoonState> getter) {
+        Set<List<SingleDimensionMoonState>> visitedStates = new HashSet<>();
+        for (int step = 1; ; step++) {
+            List<SingleDimensionMoonState> singleDimensionMoonStates = moonStates.stream().map(getter).collect(toList());
+            if (visitedStates.contains(singleDimensionMoonStates)) {
+                return step;
+            }
+            visitedStates.add(singleDimensionMoonStates);
+
+            moonStates = step(moonStates);
+        }
+    }
+
+    private static class SingleDimensionMoonState {
+
+        private final int position;
+        private final int velocity;
+
+        private SingleDimensionMoonState(int position, int velocity) {
+            this.position = position;
+            this.velocity = velocity;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SingleDimensionMoonState that = (SingleDimensionMoonState) o;
+            return position == that.position &&
+                    velocity == that.velocity;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(position, velocity);
+        }
+
+        @Override
+        public String toString() {
+            return '<' + "pos=" + position + ", vel=" + velocity + '>';
+        }
+
     }
 
     private static List<MoonState> step(List<MoonState> moonStates) {
@@ -95,6 +150,18 @@ public class Day12 extends AocDay {
         private MoonState(Vector position, Vector velocity) {
             this.position = position;
             this.velocity = velocity;
+        }
+
+        public SingleDimensionMoonState getX() {
+            return new SingleDimensionMoonState(position.x, velocity.x);
+        }
+
+        public SingleDimensionMoonState getY() {
+            return new SingleDimensionMoonState(position.y, velocity.y);
+        }
+
+        public SingleDimensionMoonState getZ() {
+            return new SingleDimensionMoonState(position.z, velocity.z);
         }
 
         public int getPotentialEnergy() {
@@ -173,6 +240,10 @@ public class Day12 extends AocDay {
         public String toString() {
             return '<' + "x=" + x + ", y=" + y + ", z=" + z + '>';
         }
+
+    }
+
+    private interface DimensionGetter extends Function<MoonState, SingleDimensionMoonState> {
 
     }
 
