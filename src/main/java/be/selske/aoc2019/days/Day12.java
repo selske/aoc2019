@@ -3,7 +3,9 @@ package be.selske.aoc2019.days;
 import be.selske.aoc2019.AocDay;
 import be.selske.aoc2019.util.MathUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +32,7 @@ public class Day12 extends AocDay {
         List<MoonState> moonStates = parseInput(input);
         int numberOfSteps = 1000;
         for (int step = 0; step < numberOfSteps; step++) {
-            moonStates = step(moonStates);
+            moonStates = step3D(moonStates);
         }
 
         return moonStates.stream()
@@ -42,23 +44,22 @@ public class Day12 extends AocDay {
         List<MoonState> moonStates = parseInput(input);
 
         int[] loopSizes = Stream.<DimensionGetter>of(MoonState::getX, MoonState::getY, MoonState::getZ)
-                .mapToInt(getter -> findCycle(moonStates, getter))
+                .parallel()
+                .map(getter -> moonStates.stream().map(getter).collect(toList()))
+                .mapToInt(Day12::findCycle)
                 .toArray();
 
         return MathUtil.lcm(loopSizes) + "";
     }
 
-    private static int findCycle(List<MoonState> moonStates, Function<MoonState, SingleDimensionMoonState> getter) {
-        Set<List<SingleDimensionMoonState>> visitedStates = new HashSet<>();
-        visitedStates.add(moonStates.stream().map(getter).collect(toList()));
+    private static int findCycle(List<SingleDimensionMoonState> initialState) {
+        List<SingleDimensionMoonState> moonStates = initialState;
 
         for (int step = 1; ; step++) {
-            moonStates = step(moonStates);
-            List<SingleDimensionMoonState> singleDimensionMoonStates = moonStates.stream().map(getter).collect(toList());
-            if (visitedStates.contains(singleDimensionMoonStates)) {
+            moonStates = step1D(moonStates);
+            if (initialState.equals(moonStates)) {
                 return step;
             }
-            visitedStates.add(singleDimensionMoonStates);
         }
     }
 
@@ -70,6 +71,11 @@ public class Day12 extends AocDay {
         private SingleDimensionMoonState(int position, int velocity) {
             this.position = position;
             this.velocity = velocity;
+        }
+
+        public SingleDimensionMoonState apply(int deltaV) {
+            int newVelocity = velocity + deltaV;
+            return new SingleDimensionMoonState(position + newVelocity, newVelocity);
         }
 
         @Override
@@ -93,7 +99,7 @@ public class Day12 extends AocDay {
 
     }
 
-    private static List<MoonState> step(List<MoonState> moonStates) {
+    private static List<MoonState> step3D(List<MoonState> moonStates) {
         List<MoonState> newMoonStates = new ArrayList<>();
 
         for (MoonState moonState : moonStates) {
@@ -122,6 +128,27 @@ public class Day12 extends AocDay {
             }
 
             Vector deltaV = new Vector(deltaX, deltaY, deltaZ);
+            newMoonStates.add(moonState.apply(deltaV));
+        }
+        return newMoonStates;
+    }
+
+    private static List<SingleDimensionMoonState> step1D(List<SingleDimensionMoonState> moonStates) {
+        List<SingleDimensionMoonState> newMoonStates = new ArrayList<>();
+
+        for (SingleDimensionMoonState moonState : moonStates) {
+            int deltaV = 0;
+            for (SingleDimensionMoonState otherMoonState : moonStates) {
+                if (otherMoonState == moonState) {
+                    continue;
+                }
+                if (moonState.position < otherMoonState.position) {
+                    deltaV++;
+                } else if (moonState.position > otherMoonState.position) {
+                    deltaV--;
+                }
+            }
+
             newMoonStates.add(moonState.apply(deltaV));
         }
         return newMoonStates;
