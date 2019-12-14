@@ -13,6 +13,9 @@ import static java.util.stream.Collectors.toMap;
 
 public class Day14 extends AocDay {
 
+    public static final String ORE = "ORE";
+    public static final String FUEL = "FUEL";
+
     public static void main(String[] args) {
         new Day14().solve(() -> Day14.class.getResource("/inputs/day14.txt"));
     }
@@ -26,11 +29,23 @@ public class Day14 extends AocDay {
 
     private static String part1(Stream<String> input) {
         Map<String, Reaction> reactions = parseInput(input);
-        return reactions.get("FUEL").getMaterialRequired("ORE", reactions) + "";
+        ReactionContext reactionContext = new ReactionContext(ORE, reactions);
+
+        return reactionContext.getSourceMaterialRequired(FUEL) + "";
     }
 
     private static String part2(Stream<String> input) {
-        return null;
+        Map<String, Reaction> reactions = parseInput(input);
+        ReactionContext reactionContext = new ReactionContext(ORE, reactions);
+        long oreRemaining = 1_000_000_000_000L;
+        long fuelCount = 0;
+        while (true) {
+            oreRemaining -= reactionContext.getSourceMaterialRequired(FUEL);
+            if (oreRemaining < 0) {
+                return fuelCount * reactions.get(FUEL).outputAmount + "";
+            }
+            fuelCount++;
+        }
     }
 
     private static Map<String, Reaction> parseInput(Stream<String> input) {
@@ -47,7 +62,7 @@ public class Day14 extends AocDay {
             reaction.addReagents(reagents);
             reaction.setOutputAmount(amount);
         }
-        reactions.get("ORE").setOutputAmount(1);
+        reactions.get(ORE).setOutputAmount(1);
         return reactions;
     }
 
@@ -78,14 +93,6 @@ public class Day14 extends AocDay {
                     '}';
         }
 
-        public int getMaterialRequired(String material, Map<String, Reaction> reactions) {
-            ReactionContext reactionContext = new ReactionContext(material, reactions);
-
-            reagents.forEach(reactionContext::react);
-
-            return reactionContext.getSourceMaterialRequired();
-        }
-
     }
 
     private static class ReactionContext {
@@ -98,16 +105,20 @@ public class Day14 extends AocDay {
         private ReactionContext(String sourceMaterial, Map<String, Reaction> reactions) {
             this.sourceMaterial = sourceMaterial;
             this.reactions = reactions;
-            this.reactions.values().forEach(reaction -> availableReagents.put(reaction.output, 0));
         }
 
-        public void react(Reaction reaction, int amount) {
+        public void react(String material) {
+            baseReagentsNeeded.clear();
+            reactions.get(material).reagents.forEach(this::react);
+        }
+
+        private void react(Reaction reaction, int amount) {
             if (reaction.reagents.keySet().stream().anyMatch(r -> r.output.equals(sourceMaterial))) {
                 baseReagentsNeeded.compute(reaction.output, (k, v) -> v == null ? amount : v + amount);
                 return;
             }
 
-            int availableAmount = availableReagents.get(reaction.output);
+            int availableAmount = availableReagents.getOrDefault(reaction.output, 0);
             if (availableAmount >= amount) {
                 availableReagents.compute(reaction.output, (k, v) -> v == null ? 0 : v - amount);
                 return;
@@ -125,14 +136,33 @@ public class Day14 extends AocDay {
                     .forEach(e -> react(e.getKey(), e.getValue() * numberOfReactions));
         }
 
-        public int getSourceMaterialRequired() {
+        private int getSourceMaterialRequired() {
             return baseReagentsNeeded.entrySet().stream()
                     .mapToInt(e -> {
-                        int outputAmount = reactions.get(e.getKey()).outputAmount;
-                        int inputAmount = reactions.get(e.getKey()).reagents.values().stream().mapToInt(Integer::intValue).sum();
-                        return (int) Math.ceil((double) e.getValue() / outputAmount) * inputAmount;
+                        String reagent = e.getKey();
+                        Reaction reaction = reactions.get(reagent);
+                        int outputAmount = reaction.outputAmount;
+                        int inputAmount = reaction.reagents.values().stream().mapToInt(Integer::intValue).sum();
+                        int amountNeeded = e.getValue();
+                        int availableAmount = availableReagents.getOrDefault(reaction.output, 0);
+                        if (availableAmount >= amountNeeded) {
+                            availableReagents.put(reaction.output, availableAmount - amountNeeded);
+                            return 0;
+                        } else {
+                            amountNeeded -= availableAmount;
+                            availableReagents.put(reaction.output, 0);
+                        }
+                        int numberOfReactions = (int) Math.ceil((double) amountNeeded / outputAmount);
+                        int amountLeftOver = outputAmount * numberOfReactions - amountNeeded;
+                        availableReagents.compute(reagent, (k, v) -> v == null ? amountLeftOver : v + amountLeftOver);
+                        return numberOfReactions * inputAmount;
                     })
                     .sum();
+        }
+
+        public long getSourceMaterialRequired(String material) {
+            react(material);
+            return getSourceMaterialRequired();
         }
 
     }
