@@ -8,11 +8,10 @@ import java.util.stream.Stream;
 
 import static java.lang.Math.toIntExact;
 import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
 
 public final class IntComputer {
 
-    private final List<Long> memory;
+    private long[] memory;
     private Long input;
     private long pointer;
     private int relativeBase;
@@ -21,7 +20,7 @@ public final class IntComputer {
     private boolean waitingForInput = false;
 
     public IntComputer(long[] memory) {
-        this.memory = Arrays.stream(memory).boxed().collect(toList());
+        this.memory = Arrays.copyOf(memory, memory.length);
         this.pointer = 0;
         this.relativeBase = 0;
     }
@@ -105,17 +104,21 @@ public final class IntComputer {
     }
 
     void setMemoryValue(long index, long value) {
-        while (memory.size() <= index) {
-            memory.add(0L);
+        if (memory.length <= index) {
+            memory = Arrays.copyOf(memory, toIntExact(index + 1));
         }
-        memory.set(toIntExact(index), value);
+        memory[toIntExact(index)] = value;
     }
 
     public long getMemoryValue(long index) {
-        while (memory.size() <= index) {
-            memory.add(0L);
+        if (memory.length <= index) {
+            memory = Arrays.copyOf(memory, toIntExact(index + 1));
         }
-        return memory.get(toIntExact(index));
+        return memory[toIntExact(index)];
+    }
+
+    public IntComputer copy() {
+        return new IntComputer(memory);
     }
 
 }
