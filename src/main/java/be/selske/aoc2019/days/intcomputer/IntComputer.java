@@ -70,7 +70,7 @@ public final class IntComputer {
     }
 
     public List<Long> getOutput() {
-        return unmodifiableList(output);
+        return unmodifiableList(new ArrayList<>(output));
     }
 
     public long getLastOutput() {
