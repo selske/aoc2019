@@ -26,13 +26,11 @@ public class Day20 extends AocDay {
     private static String part1(Stream<String> input) {
         Maze maze = parseInput(input);
 
-        List<Integer> distances = getDistances(maze);
+        List<Integer> distances = getDistances(maze, maze.start, 0, new HashSet<>());
 
-        return distances.stream().mapToInt(Integer::intValue).min().orElseThrow() + "";
-    }
-
-    private static List<Integer> getDistances(Maze maze) {
-        return getDistances(maze, maze.start, 0, new HashSet<>());
+        return distances.stream()
+                .mapToInt(Integer::intValue)
+                .min().orElseThrow() + "";
     }
 
     private static List<Integer> getDistances(Maze maze, Coordinate currentPosition, int currentDistance, Set<Coordinate> visited) {
@@ -61,15 +59,11 @@ public class Day20 extends AocDay {
     private static String part2(Stream<String> input) {
         Maze maze = parseInput(input);
 
-        List<Integer> distances = getDistancesRecursive(maze);
+        List<Integer> distances = getDistancesRecursive(maze, 0, maze.start, 0, new HashMap<>());
 
         return distances.stream()
                 .mapToInt(Integer::intValue)
                 .min().orElseThrow() + "";
-    }
-
-    private static List<Integer> getDistancesRecursive(Maze maze) {
-        return getDistancesRecursive(maze, 0, maze.start, 0, new HashMap<>());
     }
 
     private static List<Integer> getDistancesRecursive(Maze maze, int currentLevel, Coordinate currentPosition, int currentDistance, Map<Integer, Set<Coordinate>> visited) {
