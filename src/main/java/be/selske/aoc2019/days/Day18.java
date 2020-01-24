@@ -84,21 +84,12 @@ public class Day18 extends AocDay {
     }
 
     private static void print(Map<Coordinate, Character> map, Set<Coordinate> visited, int distanceTravelled) {
-        int left = Integer.MAX_VALUE;
-        int top = Integer.MIN_VALUE;
-        int right = Integer.MIN_VALUE;
-        int bottom = Integer.MAX_VALUE;
+        Coordinate.Edges edges = Coordinate.getEdges(map.keySet());
 
-        for (Coordinate coordinate : map.keySet()) {
-            if (coordinate.getX() < left) left = coordinate.getX();
-            if (coordinate.getX() > right) right = coordinate.getX();
-            if (coordinate.getY() > top) top = coordinate.getY();
-            if (coordinate.getY() < bottom) bottom = coordinate.getY();
-        }
-        left--;
-        top++;
-        right++;
-        bottom--;
+        int left = edges.getLeft() - 1;
+        int top = edges.getTop() + 1;
+        int right = edges.getRight() + 1;
+        int bottom = edges.getBottom() - 1;
 
         for (int row = top; row >= bottom; row--) {
             for (int col = left; col <= right; col++) {

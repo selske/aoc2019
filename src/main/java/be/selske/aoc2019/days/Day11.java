@@ -2,6 +2,7 @@ package be.selske.aoc2019.days;
 
 import be.selske.aoc2019.AocDay;
 import be.selske.aoc2019.Coordinate;
+import be.selske.aoc2019.Coordinate.Edges;
 import be.selske.aoc2019.Direction;
 import be.selske.aoc2019.days.intcomputer.IntComputer;
 import be.selske.aoc2019.util.DotLetter;
@@ -33,25 +34,15 @@ public class Day11 extends AocDay {
     private static String part2(Stream<String> input) {
         Map<Coordinate, Long> colors = calculateColors(input, 1L);
 
-        int left = Integer.MAX_VALUE;
-        int top = Integer.MIN_VALUE;
-        int right = Integer.MIN_VALUE;
-        int bottom = Integer.MAX_VALUE;
+        Edges edges = Coordinate.getEdges(colors.keySet());
 
-        for (Coordinate coordinate : colors.keySet()) {
-            if (coordinate.getX() < left) left = coordinate.getX();
-            if (coordinate.getX() > right) right = coordinate.getX();
-            if (coordinate.getY() > top) top = coordinate.getY();
-            if (coordinate.getY() < bottom) bottom = coordinate.getY();
-        }
-
-        int[][] image = new int[top - bottom + 1][right - left + 1];
-        for (int row = top; row >= bottom; row--) {
-            for (int col = left; col <= right; col++) {
-                Long color = colors.getOrDefault(new Coordinate(col, row), 0L);
-                int y = row + bottom * -1;
-                int x = col + left * -1;
-                image[y][x] = color.intValue();
+        int height = edges.getTop() - edges.getBottom() + 1;
+        int width = edges.getRight() - edges.getLeft() + 1;
+        int[][] image = new int[height][width];
+        for (int row = height - 1; row >= 0; row--) {
+            for (int col = 0; col < width; col++) {
+                Long color = colors.getOrDefault(new Coordinate(col, edges.getBottom() + row), 0L);
+                image[height - row - 1][col] = color.intValue();
             }
         }
         return DotLetter.getText(image);

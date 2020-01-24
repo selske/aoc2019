@@ -1,5 +1,6 @@
 package be.selske.aoc2019;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -77,6 +78,54 @@ public final class Coordinate {
         int p2 = dimension.apply(c2);
 
         return (p <= p1 && p >= p2) || (p >= p1 && p <= p2);
+    }
+
+    public static Edges getEdges(Collection<Coordinate> coordinates) {
+        int left = Integer.MAX_VALUE;
+        int top = Integer.MIN_VALUE;
+        int right = Integer.MIN_VALUE;
+        int bottom = Integer.MAX_VALUE;
+
+        for (Coordinate coordinate : coordinates) {
+            if (coordinate.getX() < left) left = coordinate.getX();
+            if (coordinate.getX() > right) right = coordinate.getX();
+            if (coordinate.getY() > top) top = coordinate.getY();
+            if (coordinate.getY() < bottom) bottom = coordinate.getY();
+        }
+
+        return new Edges(left, right, top, bottom);
+    }
+
+    public static class Edges {
+
+        private final int left;
+        private final int right;
+        private final int top;
+        private final int bottom;
+
+        private Edges(int left, int right, int top, int bottom) {
+            this.left = left;
+            this.right = right;
+            this.top = top;
+            this.bottom = bottom;
+        }
+
+        public int getLeft() {
+            return left;
+        }
+
+        public int getRight() {
+            return right;
+        }
+
+        public int getTop() {
+            return top;
+        }
+
+        public int getBottom() {
+            return bottom;
+        }
+
     }
 
 }
