@@ -269,11 +269,11 @@ public enum DotLetter {
         int length = value[0].length / 5;
         List<List<DotLetter>> possibleValues = Stream.generate(() -> Arrays.stream(values()).collect(toList())).limit(length).collect(toList());
 
-        // TODO: actual trim
+        int offset = getOffset(value);
         for (int row = 0; row < value.length; row++) {
             for (int col = 0; col < length; col++) {
                 int currentRow = row;
-                int[] fragment = Arrays.copyOfRange(value[row], col * 5, col * 5 + 5);
+                int[] fragment = Arrays.copyOfRange(value[row], col * 5 + offset, col * 5 + offset + 5);
                 possibleValues.get(col).removeIf(not(dl -> Arrays.equals(dl.pixels[currentRow], fragment)));
             }
             if (possibleValues.stream().allMatch(pv -> pv.size() == 1)) {
@@ -284,6 +284,19 @@ public enum DotLetter {
                 .map(pv -> pv.stream().findFirst().orElse(DotLetter.UNKNOWN))
                 .map(dl -> dl.value + "")
                 .collect(joining());
+    }
+
+    private static int getOffset(int[][] value) {
+        int offset;
+        for (int col = 0; col < value[0].length; col++) {
+            offset = col;
+            for (int[] rows : value) {
+                if (rows[col] != 0) {
+                    return offset;
+                }
+            }
+        }
+        return 0;
     }
 
     public static void main(String[] args) {
